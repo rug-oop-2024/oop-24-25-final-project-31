@@ -108,11 +108,6 @@ class DatasetManagement:
         st.write(f"Detected Task Type: {task_type}")
         return input_features, target_feature, task_type
 
-#task = st.selectbox('question', [options])
-#split = st.slider('question', 0.0, 1.0, 0.5)
-# ask for set of metrics: metrics = st.multiselect('question', [all metrics])
-#st.selectbox('question', ['classification', 'regression'])
-
 
 def main():
     page = DatasetManagement()

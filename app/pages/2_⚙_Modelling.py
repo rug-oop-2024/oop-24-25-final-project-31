@@ -1,6 +1,9 @@
+import os
+import pickle
 import streamlit as st
 from typing import Optional, List, Tuple, Union
 
+from autoop.core.ml.artifact import Artifact
 from autoop.core.ml.feature import Feature
 from autoop.functional.feature import detect_feature_types
 
@@ -163,7 +166,7 @@ class PipelineModelling:
             float: The proportion of the dataset to be used as the test set,
             as selected by the user.
         """
-        return st.slider("Test Set Proportion", 0.1, 0.5, 0.2)
+        return st.slider("Test Set Proportion", 0.1, 0.8, 0.2)
 
     def metrics(self, task_type: str) -> List[str]:
         """
@@ -240,6 +243,46 @@ class PipelineModelling:
             for metric_obj, value in results["training metrics"]:
                 st.write(f"{metric_obj.name}: {value}")
 
+    def save(self, pipeline: Pipeline):
+        """
+        Prompts the user for a name and version, converts the pipeline
+        into an artifact,
+        and saves it in the artifact registry.
+
+        Args:
+            pipeline (Pipeline): The configured pipeline object
+            to be saved as an artifact.
+        """
+        st.header("Save Pipeline")
+
+        pipeline_name = st.text_input("Enter a name:")
+        pipeline_version = st.text_input("Enter a version:")
+        asset_path = os.path.abspath("pipeline.py")
+        model_type = getattr(pipeline.model, 'type')
+
+        if st.button("Save Pipeline"):
+            artifact_data = {
+                "model": model_type,
+                "input_features": [feature.name for
+                                   feature in pipeline._input_features],
+                "target_feature": pipeline._target_feature.name,
+                "split_ratio": pipeline._split,
+                "metrics": [metric.name for metric in pipeline._metrics],
+            }
+
+            serialized_data = pickle.dumps(artifact_data)
+            artifact = Artifact(
+                name=pipeline_name,
+                asset_path=asset_path,
+                version=pipeline_version,
+                data=serialized_data,
+                type=model_type
+            )
+
+            self.automl.registry.register(artifact)
+            st.success(f"Pipeline '{pipeline_name}' version \
+                       '{pipeline_version}' saved successfully!")
+
 
 def main():
     page = PipelineModelling()
@@ -250,7 +293,7 @@ def main():
         df = dataset.read()
         st.write(df)
 
-        st.header("Step 2: Feature Selection and Task Type Detection")
+        st.header("Step 2: Feature Selection")
         input_features, target_feature, task_type = page._features(dataset)
 
         st.header("Step 3: Model Selection")
@@ -271,6 +314,9 @@ def main():
 
         st.header("Step 7: Train and Evaluate Model")
         page.train(pipeline)
+
+        st.header("Extra requirements: Save the pipeline")
+        page.save(pipeline)
 
 
 if __name__ == "__main__":
