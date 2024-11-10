@@ -18,8 +18,10 @@ def detect_feature_types(dataset: Dataset) -> List[Feature]:
         unique_values = set(df[column])
         if df[column].dtype == str or len(unique_values) < 10:
             type = "categorical"
-        elif df[column].dtype == int | float:
+        elif df[column].dtype in [int, 'int64', float, 'float64']:
             type = "numerical"
+        elif df[column].dtype == bool or df[column].dtype == 'bool':
+            type = "categorical"
         else:
             raise ValueError("This is not a valid type for a feature")
         feature_list.append(Feature(name=column, type=type))
