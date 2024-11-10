@@ -1,13 +1,17 @@
 from sklearn.linear_model import LinearRegression
+from autoop.core.ml.model.model import Model
+import numpy as np
 
 
-class MultipleLinearRegression:
+class MultipleLinearRegression(Model):
     """Facade for a scikit-learn Linear Regression model"""
 
-    def __init__(self):
-        self.model = LinearRegression()
+    def __init__(self, *args, **kwargs):
+        super().__init__("regression",
+                         LinearRegression,
+                         *args, **kwargs)
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         """
         Fits the model to the data.
 
@@ -16,8 +20,9 @@ class MultipleLinearRegression:
             y (np.ndarray): Target variable.
         """
         self.model.fit(X, y)
+        self._parameters = self.model.get_params()
 
-    def predict(self, X):
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """
         Predicts the target variable based on the input features.
 
@@ -28,16 +33,3 @@ class MultipleLinearRegression:
             np.ndarray: Predicted values.
         """
         return self.model.predict(X)
-
-    def score(self, X, y):
-        """
-        Evaluates the model using R^2 score by default.
-
-        Args:
-            X (np.ndarray): Features for evaluation.
-            y (np.ndarray): True target values.
-
-        Returns:
-            float: R^2 score.
-        """
-        return self.model.score(X, y)

@@ -1,12 +1,30 @@
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Literal
-import numpy as np
 
-from autoop.core.ml.dataset import Dataset
 
 class Feature(BaseModel):
-    # attributes here
+    def __init__(self, name: str, type: str) -> None:
+        self.type = type
+        self.name = name
 
-    def __str__(self):
-        raise NotImplementedError("To be implemented.")
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value: Literal["numerical", "categorical"]) -> None:
+        if value != Literal["numerical", "categorical"]:
+            raise ValueError(f"{value} is not a valid type!")
+        else:
+            self._type = value
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        if isinstance(value.strip(), str):
+            self._name = value
+        else:
+            raise ValueError(f"{value} is not a valid name!")

@@ -3,6 +3,7 @@ from typing import List
 from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.feature import Feature
 
+
 def detect_feature_types(dataset: Dataset) -> List[Feature]:
     """Assumption: only categorical and numerical features and no NaN values.
     Args:
@@ -10,4 +11,16 @@ def detect_feature_types(dataset: Dataset) -> List[Feature]:
     Returns:
         List[Feature]: List of features with their types.
     """
-    raise NotImplementedError("This should be implemented by you.")
+    df = dataset.read()
+    feature_list = []
+
+    for column in list(df.columns):
+        unique_values = set(df[column])
+        if df[column].dtype() == str or len(unique_values) < 10:
+            type = "categorical"
+        elif df[column].dtype() == int | float:
+            type = "numerical"
+        else:
+            raise ValueError("This is not a valid type for a feature")
+        feature_list.append(Feature(name=column, type=type))
+    return feature_list

@@ -1,9 +1,10 @@
-
 from autoop.core.ml.model.model import Model
 from autoop.core.ml.model.regression import MultipleLinearRegression
 from autoop.core.ml.model.regression import RidgeRegression
 from autoop.core.ml.model.regression import LassoRegression
-
+from autoop.core.ml.model.classification.k_neighbours_classifier import KNearestClassifier
+from autoop.core.ml.model.classification.support_vector import SupportVectorClassifier
+from autoop.core.ml.model.classification.decision_tree import DecisionTreeClassifier
 
 REGRESSION_MODELS = [
     "multiple_linear_regression",
@@ -12,6 +13,9 @@ REGRESSION_MODELS = [
 ]  # add your models as str here
 
 CLASSIFICATION_MODELS = [
+    "k_neighbours_classification",
+    "support_vector_classification",
+    "decision_tree_classification"
 ]  # add your models as str here
 
 
@@ -20,6 +24,9 @@ def get_model(model_name: str) -> Model:
     models = {
         "multiple_linear_regression": MultipleLinearRegression(),
         "lasso_regression": LassoRegression(),
-        "ridge_regression": RidgeRegression()
+        "ridge_regression": RidgeRegression(),
+        "k_neighbours_classification": KNearestClassifier(),    
+        "support_vector_classification": SupportVectorClassifier(),
+        "decision_tree_classification": DecisionTreeClassifier()
     }
     return models.get(model_name, None)
