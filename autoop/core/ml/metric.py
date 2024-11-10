@@ -47,8 +47,8 @@ class Metric(ABC):
             name (str): str name of the metric.
             description (str, optional): str description of the metric.
         """
-        self.name = name
-        self.description = description
+        self._name = name
+        self._description = description
 
     def __str__(self) -> str:
         """Return a string representation of the object.
@@ -57,7 +57,7 @@ class Metric(ABC):
             str: A string representation of the object in the format
             {name}: {description}
         """
-        return f"{self.name}: {self.description}"
+        return f"{self._name}: {self._description}"
 
     @abstractmethod
     def evaluate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
