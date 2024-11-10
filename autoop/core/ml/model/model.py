@@ -1,6 +1,4 @@
 from abc import abstractmethod
-# from autoop.core.database import Database
-# from autoop.core.ml.artifact import Artifact
 import numpy as np
 from copy import deepcopy
 from typing import Literal
@@ -16,6 +14,21 @@ class Model:
             *args,
             **kwargs
             ):
+        """
+        Initializes a Model instance.
+
+        Parameters
+        ----------
+        type : Literal["classification", "regression"]
+            The type of model, specifying whether it is a classification
+            or regression model.
+        model : Model
+            The model class to be instantiated.
+        *args :
+            Positional arguments to be passed to the model instantiation.
+        **kwargs :
+            Keyword arguments to be passed to the model instantiation.
+        """
         self.type = type
         self.model = model(*args, **kwargs)
         self._parameters: dict = {}
@@ -53,10 +66,9 @@ class Model:
         -------
         None
         """
-        if isinstance(type, Literal["classification", "regression"]):
-            self._type = value
-        else:
+        if value not in ("classification", "regression"):
             raise ValueError(f"{value} is not a valid model type.")
+        self._type = value
 
     @property
     def parameters(self):
@@ -73,9 +85,39 @@ class Model:
 
     @parameters.setter
     def parameters(self, params: dict) -> None:
+        """
+        Sets the model's parameters.
+
+        Parameters
+        ----------
+        params : dict
+            A dictionary containing the model's parameters, including both
+            strict parameters and hyperparameters.
+
+        Returns
+        -------
+        None
+        """
         self._parameters = params
 
     def to_artifact(self, name: str) -> Artifact:
+        """
+        Converts the model to an artifact.
+
+        The artifact is created by serializing the model's parameters
+        into a bytes object and saving it in the artifact's data
+        attribute.
+
+        Parameters
+        ----------
+        name : str
+            The name of the artifact.
+
+        Returns
+        -------
+        Artifact
+            The created artifact.
+        """
         return Artifact(name=name, data=self.parameters)
 
     @abstractmethod

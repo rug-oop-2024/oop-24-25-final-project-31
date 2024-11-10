@@ -1,13 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, PrivateAttr
 from typing import Literal
 
 
 class Feature(BaseModel):
-    name: str
-    _type: str = None
+    _name: str = PrivateAttr
+    _type: str = PrivateAttr
 
     def __init__(self, name: str,
-                 type: Literal["numerical", "categorical"]) -> None:
+                 type: Literal["numerical", "categorical"], **kwargs) -> None:
+        super().__init__(**kwargs)
         self.type = type
         self.name = name
 

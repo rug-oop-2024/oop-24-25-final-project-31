@@ -11,6 +11,14 @@ class MultipleLinearRegression(Model):
                          LinearRegression,
                          *args, **kwargs)
 
+    def __str__(self) -> str:
+        """Return a string representation of the object.
+
+        Returns:
+            str: A string representation of the object.
+        """
+        return "Multiple Linear Regression Model"
+
     def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         """
         Fits the model to the data.

@@ -15,8 +15,16 @@ METRICS = [
 
 
 def get_metric(name: str) -> Any:
-    # Factory function to get a metric by name.
-    # Return a metric instance given its str name.
+    """
+    Factory function to get a metric by name.
+
+    Args:
+        name (str): str name of the metric
+
+    Returns:
+        Any: a metric instance given its str name. If name is not found,
+        returns None.
+    """
     metrics = {
         "mean_squared_error": MeanSquaredError(),
         "mean_absolute_error": MeanAbsoluteError(),
@@ -31,18 +39,28 @@ def get_metric(name: str) -> Any:
 class Metric(ABC):
     """Base class for all metrics.
     """
-    # your code here
-    # remember: metrics take ground truth and prediction as input
-    # and return a real number
     def __init__(self, name: str, description: str = None):
+        """
+        Initialize a metric.
+
+        Args:
+            name (str): str name of the metric.
+            description (str, optional): str description of the metric.
+        """
         self.name = name
         self.description = description
 
     def __str__(self) -> str:
+        """Return a string representation of the object.
+
+        Returns:
+            str: A string representation of the object in the format
+            {name}: {description}
+        """
         return f"{self.name}: {self.description}"
 
     @abstractmethod
-    def __call__(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    def evaluate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         """Compute the metric given ground truth and predictions.
         Args:
             y_true (np.ndarray): Ground truth values
@@ -53,39 +71,98 @@ class Metric(ABC):
         pass
 
 
-# add here concrete implementations of the Metric class
 class MeanAbsoluteError(Metric):
     def __init__(self):
+        """
+        Initialize the MeanAbsoluteError metric.
+
+        This metric measures the average absolute difference
+        between the true values and the predicted values.
+
+        Args:
+            None
+        """
         super().__init__(
             name="mean_absolute_error",
             description="Measures the\
             average absolute difference"
             )
 
-    def __call__(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    def evaluate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+        """Compute the mean absolute difference between the ground truth
+        and the predictions.
+
+        Args:
+            y_true (np.ndarray): Ground truth values
+            y_pred (np.ndarray): Predicted values
+
+        Returns:
+            float: The mean absolute difference between the ground truth
+            and the predictions
+        """
         return np.mean(np.abs(y_true - y_pred))
 
 
 class MeanSquaredError(Metric):
     def __init__(self):
+        """
+        Initialize the MeanSquaredError metric.
+
+        This metric measures the average squared difference
+        between the true values and the predicted values.
+
+        Args:
+            None
+        """
         super().__init__(
             name="mean_squared_error",
             description="Measures the average squared difference"
             )
 
-    def __call__(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    def evaluate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+        """Compute the mean squared difference between the ground truth
+        and the predictions.
+
+        Args:
+            y_true (np.ndarray): Ground truth values
+            y_pred (np.ndarray): Predicted values
+
+        Returns:
+            float: The mean squared difference between the ground truth
+            and the predictions
+        """
         return np.mean((y_true - y_pred) ** 2)
 
 
 class RootMeanSquaredError(Metric):
     def __init__(self):
+        """
+        Initialize the RootMeanSquaredError metric.
+
+        This metric measures the square root of the average
+        squared difference between the true values and the predicted values.
+
+        Args:
+            None
+        """
         super().__init__(
             name="root_mean_squared_error",
             description="Measures the square root\
             of the average squared difference"
             )
 
-    def __call__(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    def evaluate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+        """Compute the root mean squared difference between the ground truth
+        and the predictions.
+
+        Args:
+            y_true (np.ndarray): Ground truth values
+            y_pred (np.ndarray): Predicted values
+
+        Returns:
+            float: The root mean squared difference between the ground truth
+            and the predictions
+        """
         mse = np.mean((y_true - y_pred) ** 2)
         rmse = np.sqrt(mse)
         return rmse
@@ -93,13 +170,32 @@ class RootMeanSquaredError(Metric):
 
 class Accuracy(Metric):
     def __init__(self):
+        """
+        Initialize the Accuracy metric.
+
+        This metric measures the proportion of correctly determined features.
+        Accuracy is defined as the number of correctly classified samples
+        divided by the total number of samples.
+
+        Args:
+            None
+        """
         super().__init__(
             name="accuracy",
             description="measures the proportion of\
             correctly determined features"
             )
 
-    def __call__(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    def evaluate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+        """Compute the accuracy between the ground truth and the predictions.
+
+        Args:
+            y_true (np.ndarray): Ground truth values
+            y_pred (np.ndarray): Predicted values
+
+        Returns:
+            float: The accuracy between the ground truth and the predictions
+        """
         return np.setdiff1d(y_pred.flatten(),
                             y_true.flatten()).size/y_pred.size
 
@@ -109,6 +205,26 @@ def precision_recall(
         y_true: np.ndarray,
         y_pred: np.ndarray
         ) -> float:
+    """
+    Compute the weighted precision or recall between the ground truth
+    and the predictions.
+
+    Parameters
+    ----------
+    type : str
+        The type of metric to compute. It can be either 'precision' or 'recall'
+    y_true : np.ndarray
+        Ground truth values
+    y_pred : np.ndarray
+        Predicted values
+
+    Returns
+    -------
+    float
+        The weighted precision or recall between the ground truth
+        and the predictions
+    """
+
     classes = np.unique(y_true)
     total_weight = y_true.size
     result = 0
@@ -132,23 +248,75 @@ def precision_recall(
 
 class WeightedPrecision(Metric):
     def __init__(self):
+        """
+        Initializes a WeightedPrecision metric.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        WeightedPrecision
+            An instance of the WeightedPrecision metric
+        """
         super().__init__(
             name="weighted_precision",
             description="calculates the weighted\
             true positive proportion"
             )
 
-    def __call__(self, **kwargs) -> float:
+    def evaluate(self, **kwargs) -> float:
+        """
+        Evaluate the weighted precision metric using the
+        precision_recall function.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments passed to the precision_recall function
+
+        Returns
+        -------
+        float
+            The weighted precision score
+        """
         return precision_recall("precision", **kwargs)
 
 
 class WeightedRecall(Metric):
     def __init__(self):
+        """
+        Initializes a WeightedRecall metric.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        WeightedRecall
+            An instance of the WeightedRecall metric
+        """
         super().__init__(
             name="weighted_recall",
             description="calculates the weighted\
             true positive rate"
             )
 
-    def __call__(self, **kwargs) -> float:
+    def evaluate(self, **kwargs) -> float:
+        """
+        Evaluates the weighted recall metric using the
+        precision_recall function.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments passed to precision_recall function
+
+        Returns
+        -------
+        float
+            The weighted recall metric
+        """
         return precision_recall("recall", **kwargs)

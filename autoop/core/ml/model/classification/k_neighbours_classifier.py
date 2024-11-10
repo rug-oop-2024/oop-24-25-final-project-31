@@ -5,7 +5,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 class KNearestClassifier(Model):
     """
-    Wrapper of KNeigborsClassifier model from scikit-learn
+    Wrapper of KNeighboursClassifier model from scikit-learn
     """
     def __init__(self, *args, **kwargs):
         """
@@ -26,6 +26,14 @@ class KNearestClassifier(Model):
         super().__init__("classification",
                          KNeighborsClassifier,
                          *args, **kwargs)
+
+    def __str__(self) -> str:
+        """Return a string representation of the object.
+
+        Returns:
+            str: A string representation of the object.
+        """
+        return "K Nearest Neighbours Classifier Model"
 
     def fit(self, X: np.ndarray, Y: np.ndarray) -> None:
         """

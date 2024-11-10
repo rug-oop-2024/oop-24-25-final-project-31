@@ -22,6 +22,14 @@ class DTreeClassifier(Model):
                          DecisionTreeClassifier,
                          *args, **kwargs)
 
+    def __str__(self) -> str:
+        """Return a string representation of the object.
+
+        Returns:
+            str: A string representation of the object.
+        """
+        return "Decision Tree Classifier Model"
+
     def fit(self, X: np.ndarray, Y: np.ndarray) -> None:
         """
         Fits the Decision Tree model to the provided data.

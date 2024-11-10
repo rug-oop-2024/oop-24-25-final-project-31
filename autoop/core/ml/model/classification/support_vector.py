@@ -19,6 +19,14 @@ class SupportVectorClassifier(Model):
                          SVC,
                          *args, **kwargs)
 
+    def __str__(self) -> str:
+        """Return a string representation of the object.
+
+        Returns:
+            str: A string representation of the object.
+        """
+        return "Support Vector Classifier Model"
+
     def fit(self, X: np.ndarray, Y: np.ndarray) -> None:
         """
         Fits the model to the data.

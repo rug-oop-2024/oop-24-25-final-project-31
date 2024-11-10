@@ -10,6 +10,14 @@ class LassoRegression(Model):
                          Lasso,
                          *args, **kwargs)
 
+    def __str__(self) -> str:
+        """Return a string representation of the object.
+
+        Returns:
+            str: A string representation of the object.
+        """
+        return "Lasso Regression Model"
+
     def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         """
         Fits the Lasso Regression model to the provided data.

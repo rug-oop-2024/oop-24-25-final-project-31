@@ -1,5 +1,6 @@
 import streamlit as st
 
+from autoop.core.ml.feature import Feature
 from autoop.functional.feature import detect_feature_types
 
 
@@ -73,15 +74,29 @@ if selected_dataset:
     categorical_features = [f.name for f
                             in features if f.type == "categorical"]
 
-    input_features = st.multiselect("Select input features",
-                                    numerical_features + categorical_features)
-    target_feature = st.selectbox("Select target feature:", df.columns)
+    input_features = []
+    input_feature_names = st.multiselect("Select input features",
+                                         numerical_features +
+                                         categorical_features)
+    for feature_name in input_feature_names:
+        if feature_name in numerical_features:
+            feature_type = "numerical"
+        elif feature_name in categorical_features:
+            feature_type = "categorical"
+        else:
+            raise ValueError(f"Unknown feature type for {feature_name}")
 
-    # detect task type
+    input_features.append(Feature(name=feature_name, type=feature_type))
+
+    target_feature = st.selectbox("Select target feature:", df.columns)
     if target_feature in numerical_features:
+        feature_type = "numerical"
         task_type = "regression"
     else:
+        feature_type = "categorical"
         task_type = "classification"
+
+    target_feature = Feature(name=target_feature, type=feature_type)
 
     st.write(f"Detected Task Type: {task_type}")
 
