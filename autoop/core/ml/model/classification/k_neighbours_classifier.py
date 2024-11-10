@@ -48,7 +48,7 @@ class KNearestClassifier(Model):
         method of the KNeighborsClassifier instance after fitting the model.
         """
         self.model.fit(X, Y)
-        self._parameters = self._model.get_params()
+        self.parameters = self._model.get_params()
 
     def predict(self, input: np.ndarray) -> np.ndarray:
         """

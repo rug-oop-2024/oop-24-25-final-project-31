@@ -20,7 +20,7 @@ class MultipleLinearRegression(Model):
             y (np.ndarray): Target variable.
         """
         self.model.fit(X, y)
-        self._parameters = self.model.get_params()
+        self.parameters = self.model.get_params()
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """

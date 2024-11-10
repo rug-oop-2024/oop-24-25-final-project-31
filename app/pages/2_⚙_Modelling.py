@@ -1,9 +1,9 @@
 import streamlit as st
-from sklearn.pipeline import Pipeline
-
 
 from autoop.functional.feature import detect_feature_types
 
+
+from autoop.core.ml.pipeline import Pipeline
 
 from autoop.core.ml.model.regression.multiple_linear_regression import (
     MultipleLinearRegression,
@@ -95,23 +95,13 @@ if selected_dataset:
                                   [LassoRegression(),
                                    RidgeRegression(),
                                    MultipleLinearRegression()])
-        if model_type == "Lasso Regression":
-            model = LassoRegression()
-        elif model_type == "Ridge Regression":
-            model = RidgeRegression()
-        elif model_type == "Multiple Linear Regression":
-            model = MultipleLinearRegression()
+        model = model_type
     else:
         model_type = st.selectbox("Select Classification Model: ",
                                   [KNearestClassifier(),
                                    SupportVectorClassifier(),
                                    DTreeClassifier()])
-        if model_type == "K-Nearest Neighbors":
-            model = KNearestClassifier()
-        elif model_type == "Support Vector Classifier":
-            model = SupportVectorClassifier()
-        elif model_type == "Decision Tree Classifier":
-            model = DTreeClassifier()
+        model = model_type
 
     # ST/modelling/pipeline/split: Prompt the user to select a dataset split.
 
@@ -139,7 +129,7 @@ if selected_dataset:
     pipeline = Pipeline(
             metrics=[metric],
             dataset=data,
-            model=model_type,
+            model=model,
             input_features=input_features,
             target_feature=target_feature,
             split=test_size

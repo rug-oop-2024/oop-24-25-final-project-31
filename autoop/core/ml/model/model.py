@@ -5,6 +5,8 @@ import numpy as np
 from copy import deepcopy
 from typing import Literal
 
+from autoop.core.ml.artifact import Artifact
+
 
 class Model:
     def __init__(
@@ -68,6 +70,13 @@ class Model:
             strict parameters and hyperparameters.
         """
         return deepcopy(self._parameters)
+
+    @parameters.setter
+    def parameters(self, params: dict) -> None:
+        self._parameters = params
+
+    def to_artifact(self, name: str) -> Artifact:
+        return Artifact(name=name, data=self.parameters)
 
     @abstractmethod
     def fit(self, observations: np.ndarray, target: np.ndarray) -> None:

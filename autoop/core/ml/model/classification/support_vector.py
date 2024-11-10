@@ -28,7 +28,7 @@ class SupportVectorClassifier(Model):
             Y (np.ndarray): Target variable.
         """
         self.model.fit(X, Y)
-        self._parameters = self._model.get_params()
+        self.parameters = self._model.get_params()
 
     def predict(self, input: np.ndarray) -> np.ndarray:
         """
