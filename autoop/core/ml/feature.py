@@ -3,27 +3,47 @@ from typing import Literal
 
 
 class Feature(BaseModel):
-    def __init__(self, name: str, type: str) -> None:
+    name: str
+    _type: str = None
+
+    def __init__(self, name: str,
+                 type: Literal["numerical", "categorical"]) -> None:
         self.type = type
         self.name = name
 
     @property
-    def type(self):
+    def type(self) -> str:
+        """
+        The type of the feature.
+        It can be either numerical or categorical.
+        """
         return self._type
 
     @type.setter
-    def type(self, value: Literal["numerical", "categorical"]) -> None:
-        if value != Literal["numerical", "categorical"]:
+    def type(self, value: str) -> None:
+        """
+        Setter for the type of the feature.
+        Validates that the provided name is either
+        numerical or categorical.
+        """
+        if value not in ["numerical", "categorical"]:
             raise ValueError(f"{value} is not a valid type!")
         else:
             self._type = value
 
     @property
     def name(self) -> str:
+        """
+        The name of the feature.
+        """
         return self._name
 
     @name.setter
     def name(self, value: str) -> None:
+        """
+        Setter for the name of the feature.
+        Validates that the provided value is a non-empty string.
+        """
         if isinstance(value.strip(), str):
             self._name = value
         else:
