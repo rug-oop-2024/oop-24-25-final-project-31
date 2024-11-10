@@ -67,8 +67,6 @@ if selected_dataset:
     # type (i.e., classification or regression).
 
     st.header("Step 2: Feature Selection and task type detection")
-
-    # detect features
     features = detect_feature_types(data)
     numerical_features = [f.name for f in features if f.type == "numerical"]
     categorical_features = [f.name for f
@@ -85,18 +83,16 @@ if selected_dataset:
             feature_type = "categorical"
         else:
             raise ValueError(f"Unknown feature type for {feature_name}")
+        input_features.append(Feature(name=feature_name, type=feature_type))
 
-    input_features.append(Feature(name=feature_name, type=feature_type))
-
-    target_feature = st.selectbox("Select target feature:", df.columns)
-    if target_feature in numerical_features:
+    target_feature_name = st.selectbox("Select target feature:", df.columns)
+    if target_feature_name in numerical_features:
         feature_type = "numerical"
         task_type = "regression"
     else:
         feature_type = "categorical"
         task_type = "classification"
-
-    target_feature = Feature(name=target_feature, type=feature_type)
+    target_feature = Feature(name=target_feature_name, type=feature_type)
 
     st.write(f"Detected Task Type: {task_type}")
 
@@ -106,17 +102,15 @@ if selected_dataset:
     st.header("Step 3: Model selection")
 
     if task_type == "regression":
-        model_type = st.selectbox("Select Regression Model: ",
-                                  [LassoRegression(),
-                                   RidgeRegression(),
-                                   MultipleLinearRegression()])
-        model = model_type
+        model = st.selectbox("Select Regression Model: ",
+                             [LassoRegression(),
+                              RidgeRegression(),
+                              MultipleLinearRegression()])
     else:
-        model_type = st.selectbox("Select Classification Model: ",
-                                  [KNearestClassifier(),
-                                   SupportVectorClassifier(),
-                                   DTreeClassifier()])
-        model = model_type
+        model = st.selectbox("Select Classification Model: ",
+                             [KNearestClassifier(),
+                              SupportVectorClassifier(),
+                              DTreeClassifier()])
 
     # ST/modelling/pipeline/split: Prompt the user to select a dataset split.
 
@@ -151,7 +145,12 @@ if selected_dataset:
         )
 
     if st.button("Show Pipeline Summary"):
-        st.write(pipeline)
+        st.write("Pipeline Summary")
+        st.write("Model:", model)
+        st.write("Input Features:", [f.name for f in input_features])
+        st.write("Target Feature:", target_feature.name)
+        st.write("Split Ratio:", test_size)
+        st.write("Metrics:", metric.name)
 
     # ST/modelling/pipeline/train: Train the class and report
     # the results of the pipeline.
