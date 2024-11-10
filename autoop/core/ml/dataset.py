@@ -1,5 +1,4 @@
 from autoop.core.ml.artifact import Artifact
-# from abc import ABC, abstractmethod
 import pandas as pd
 import io
 
@@ -24,8 +23,7 @@ class Dataset(Artifact):
         )
 
     def read(self) -> pd.DataFrame:
-        bytes = super().read()
-        csv = bytes.decode()
+        csv = self.data.decode()
         return pd.read_csv(io.StringIO(csv))
 
     def save(self, data: pd.DataFrame) -> bytes:

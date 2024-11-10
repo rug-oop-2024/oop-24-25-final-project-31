@@ -16,9 +16,9 @@ def detect_feature_types(dataset: Dataset) -> List[Feature]:
 
     for column in list(df.columns):
         unique_values = set(df[column])
-        if df[column].dtype() == str or len(unique_values) < 10:
+        if df[column].dtype == str or len(unique_values) < 10:
             type = "categorical"
-        elif df[column].dtype() == int | float:
+        elif df[column].dtype == int | float:
             type = "numerical"
         else:
             raise ValueError("This is not a valid type for a feature")

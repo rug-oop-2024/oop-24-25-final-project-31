@@ -45,16 +45,16 @@ datasets = automl.registry.list(type="dataset")
 # registry. You can use a select box to achieve this.
 st.header("Step 1: Load the Dataset")
 
-dataset_list = [ds['name'] for ds in datasets]
+dataset_list = [ds.name for ds in datasets]
 selected_dataset = st.selectbox("Select a Dataset:", dataset_list)
 
 if selected_dataset:
-    dataset = next(ds for ds in datasets if ds['name'] == selected_dataset)
+    dataset = next(ds for ds in datasets if ds.name == selected_dataset)
     data = Dataset(
-        name=dataset['name'],
-        asset_path=dataset['asset_path'],
-        version=dataset['version'],
-        data=dataset.get('data')
+        name=dataset.name,
+        asset_path=dataset.asset_path,
+        version=dataset.version,
+        data=dataset.data
     )
     df = data.read()
     st.write(df)
