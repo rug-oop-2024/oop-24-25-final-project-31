@@ -29,15 +29,23 @@ jobs:
 
       - name: Configure Flake8
         run: |
+          # Identify files with null bytes
+          null_byte_files=$(grep -rl $'\x00' . || true)  # Avoid error if no null-byte files
+          
+          # Base exclude list
+          exclude_list=".github,autoop/tests"
+          
+          # Append null-byte files if any
+          if [ -n "$null_byte_files" ]; then
+            null_byte_exclude=$(echo "$null_byte_files" | paste -sd "," -)
+            exclude_list="$exclude_list,$null_byte_exclude"
+          fi
+
+          # Write .flake8 config
           echo "[flake8]" > .flake8
           echo "extend-ignore = E402" >> .flake8
-          echo "exclude = .github,autoop/tests" >> .flake8
-          # exclude A101, A102, D100 and everything that starts with D2 and D4
+          echo "exclude = $exclude_list" >> .flake8
           echo "ignore = ANN101,ANN102,D100,D2,D4,ANN002,ANN003" >> .flake8
-          # Identify files with null bytes
-          null_byte_files=$(grep -rl $'\x00' .)
-          exclude_files=$(echo "$null_byte_files" | paste -sd "," -)
-          echo "exclude = $exclude_files" >> .flake8
 
 
       - name: Run flake8
