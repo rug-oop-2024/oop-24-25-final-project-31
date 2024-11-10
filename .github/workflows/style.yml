@@ -1,0 +1,56 @@
+name: Style check
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  flake8_py3:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install flake8 and plugins
+        run: |
+          pip install flake8 flake8-docstrings flake8-annotations
+
+      - name: Configure Flake8
+        run: |
+          # Identify files with null bytes
+          null_byte_files=$(grep -rl $'\x00' . || true)  # Avoid error if no null-byte files
+          
+          # Base exclude list
+          exclude_list=".github,autoop/tests"
+          
+          # Append null-byte files if any
+          if [ -n "$null_byte_files" ]; then
+            null_byte_exclude=$(echo "$null_byte_files" | paste -sd "," -)
+            exclude_list="$exclude_list,$null_byte_exclude"
+          fi
+
+          # Write .flake8 config
+          echo "[flake8]" > .flake8
+          echo "extend-ignore = E402" >> .flake8
+          echo "exclude = $exclude_list" >> .flake8
+          echo "ignore = ANN101,ANN102,D100,D2,D4,ANN002,ANN003" >> .flake8
+
+
+      - name: Run flake8
+        uses: suo/flake8-github-action@releases/v1
+        with:
+          checkName: "flake8_py3"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
