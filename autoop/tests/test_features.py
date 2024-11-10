@@ -6,12 +6,16 @@ from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.feature import Feature
 from autoop.functional.feature import detect_feature_types
 
+
 class TestFeatures(unittest.TestCase):
 
     def setUp(self) -> None:
         pass
 
     def test_detect_features_continuous(self):
+        """
+        Test if detect_feature_types can detect numerical features correctly.
+        """
         iris = load_iris()
         df = pd.DataFrame(
             iris.data,
@@ -31,8 +35,18 @@ class TestFeatures(unittest.TestCase):
             self.assertIsInstance(feature, Feature)
             self.assertEqual(feature.name in iris.feature_names, True)
             self.assertEqual(feature.type, "numerical")
-        
+
     def test_detect_features_with_categories(self):
+        """
+        Test if detect_feature_types can detect features with
+        categories correctly.
+
+        The "adult" dataset is used for this test,
+        which contains 14 features with
+        2 numerical features and 12 categorical features.
+        The test checks if all
+        the features are detected correctly.
+        """
         data = fetch_openml(name="adult", version=1, parser="auto")
         df = pd.DataFrame(
             data.data,
@@ -66,7 +80,9 @@ class TestFeatures(unittest.TestCase):
         for feature in features:
             self.assertIsInstance(feature, Feature)
             self.assertEqual(feature.name in data.feature_names, True)
-        for detected_feature in filter(lambda x: x.name in numerical_columns, features):
+        for detected_feature in filter(lambda x: x.name in
+                                       numerical_columns, features):
             self.assertEqual(detected_feature.type, "numerical")
-        for detected_feature in filter(lambda x: x.name in categorical_columns, features):
+        for detected_feature in filter(lambda x: x.name in
+                                       categorical_columns, features):
             self.assertEqual(detected_feature.type, "categorical")

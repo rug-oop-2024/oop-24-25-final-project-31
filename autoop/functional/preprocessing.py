@@ -36,6 +36,6 @@ def preprocess_features(
             artifact = {"type": "StandardScaler",
                         "scaler": scaler.get_params()}
             results.append((feature.name, data, artifact))
-    # Sort for consistency
+
     results = list(sorted(results, key=lambda x: x[0]))
     return results

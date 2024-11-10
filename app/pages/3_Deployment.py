@@ -20,6 +20,7 @@ class DeploymentPage:
         self.saved_pipe = self.automl.registry.list(type="pipeline")
 
     def run(self):
+        """Show saved pipelines and their relevant information."""
         if self.saved_pipe:
             st.write(f"Found {len(self.saved_pipe)} saved pipelines.")
 

@@ -35,18 +35,34 @@ class Pipeline():
                              continuous target feature")
 
     def __str__(self) -> str:
+        """Return a string representation of the pipeline.
+
+        The string representation includes the model type, input features,
+        target feature, split, and metrics.
+
+        Returns:
+            str: The string representation of the pipeline.
+        """
         return f"""
-Pipeline(
-    model={self._model.type},
-    input_features={list(map(str, self._input_features))},
-    target_feature={str(self._target_feature)},
-    split={self._split},
-    metrics={list(map(str, self._metrics))},
-)
-"""
+            Pipeline(
+                model={self._model.type},
+                input_features={list(map(str, self._input_features))},
+                target_feature={str(self._target_feature)},
+                split={self._split},
+                metrics={list(map(str, self._metrics))},
+            )
+            """
 
     @property
     def model(self) -> Model:
+        """
+        Returns the model used in the pipeline.
+
+        Returns
+        -------
+        Model
+            The model used in the pipeline.
+        """
         return self._model
 
     @property
@@ -81,9 +97,23 @@ Pipeline(
         return artifacts
 
     def _register_artifact(self, name: str, artifact) -> None:
+        """
+        Registers an artifact with the given name in the pipeline's
+        artifacts dictionary.
+
+        Args:
+            name (str): The name to associate with the artifact.
+            artifact: The artifact to register.
+        """
         self._artifacts[name] = artifact
 
     def _preprocess_features(self) -> None:
+        """
+        Preprocesses the features and registers the artifacts
+        generated during the preprocessing process.
+        The preprocessed data is stored in instance variables
+        _input_vectors and _output_vector.
+        """
         (target_feature_name, target_data, artifact) = preprocess_features(
             [self._target_feature],
             self._dataset
@@ -102,6 +132,17 @@ Pipeline(
 
     def _split_data(self) -> None:
         # Split the data into training and testing sets
+        """
+        Splits the preprocessed data into training and testing sets
+        according to the split ratio specified in the pipeline's
+        configuration.
+
+        The training set is the first 'split' proportion of the data,
+        and the testing set is the remaining 1-split proportion.
+
+        The training and testing sets are stored in the instance
+        variables _train_X, _train_y, _test_X, and _test_y.
+        """
         split = self._split
         self._train_X = [vector[:int(split * len(vector))]
                          for vector in self._input_vectors]
@@ -115,14 +156,47 @@ Pipeline(
             ]
 
     def _compact_vectors(self, vectors: List[np.array]) -> np.array:
+        """
+        Compact the input vectors into a single 2D numpy array.
+
+        This method takes the list of input vectors and concatenates them
+        along the columns (axis=1) into a single 2D numpy array.
+
+        Parameters
+        ----------
+        vectors : List[np.array]
+            List of input vectors to be compacted
+
+        Returns
+        -------
+        np.array
+            Compact 2D numpy array
+        """
         return np.concatenate(vectors, axis=1)
 
     def _train(self) -> None:
+        """
+        Train the model on the training set.
+
+        This method compacts the training input vectors and fits the
+        model.
+        """
         X = self._compact_vectors(self._train_X)
         Y = self._train_y
         self._model.fit(X, Y)
 
     def _evaluate(self) -> None:
+        """
+        Evaluate the model on the test set and store the predictions
+        and metrics results.
+
+        This method compacts the test input vectors, makes predictions
+        using the model,
+        and evaluates the predictions against the true test outputs using
+        the specified
+        metrics. The results are stored in the _metrics_results and
+        _predictions attributes.
+        """
         X = self._compact_vectors(self._test_X)
         Y = self._test_y
         self._metrics_results = []
@@ -133,6 +207,9 @@ Pipeline(
         self._predictions = predictions
 
     def _evaluate_training(self) -> None:
+        """
+        Evaluate the model on the training set.
+        """
         X = self._compact_vectors(self._train_X)
         Y = self._train_y
         self._training_metrics_results = []
@@ -143,6 +220,11 @@ Pipeline(
         self._train_predictions = predictions
 
     def execute(self) -> dict:
+        """
+        Execute the pipeline. This method will first preprocess the features,
+        split the data, train the model, evaluate the model on the test set,
+        and evaluate the model on the training set.
+        """
         self._preprocess_features()
         self._split_data()
         self._train()
